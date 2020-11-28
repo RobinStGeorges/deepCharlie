@@ -75,9 +75,10 @@ if __name__ == "__main__":
     # plt.imshow(npimg)
     # plt.show()
 
+    # print("img", img)
+    # print("label", label)
+
     print("cnn enter")
-    print("img", img)
-    print("label", label)
     cnn = CNN()
     print("cnn out")
 
@@ -90,7 +91,9 @@ if __name__ == "__main__":
             inputs, label = img
 
             optimizer.zero_grad() #Initialisation de l'optimiseur
+            print('et de un')
             output = cnn(inputs)
+            print('fin de un')
             error = errorFunction(output, label)
             error.backward()
             optimizer.step()
