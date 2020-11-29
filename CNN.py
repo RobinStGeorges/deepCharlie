@@ -28,13 +28,13 @@ class CNN(nn.Module):
         # 4608 input features, 64 output features (see sizing flow below)
         self.fc1 = torch.nn.Linear(18 * 50 * 50, 64)
 
-        # 64 input features, 10 output features for our 10 defined classes
+        # 64 input features, 2 output features for our 2 defined classes
         self.fc2 = torch.nn.Linear(64, 2)
 
     def forward(self, x):
         # Computes the activation of the first convolution
         # Size changes from (3, 32, 32) to (18, 32, 32)
-        x = F.relu(self.conv1(x))
+        x = self.conv1(x)
 
         # Size changes from (18, 32, 32) to (18, 16, 16)
         x = self.pool(x)
@@ -51,7 +51,6 @@ class CNN(nn.Module):
         # Computes the second fully connected layer (activation applied later)
         # Size changes from (1, 64) to (1, 10)
         x = self.fc2(x)
-        print("output : ", x)
         return (x)
 
 
@@ -78,31 +77,29 @@ if __name__ == "__main__":
     # print("img", img)
     # print("label", label)
 
-    print("cnn enter")
     cnn = CNN()
-    print("cnn out")
 
     optimizer = torch.optim.SGD(cnn.parameters(), lr=1e-4)
     errorFunction = nn.CrossEntropyLoss()
 
 
-    for iteration in range(1):
+    for iteration in range(10000):
         for i, img in enumerate(loader):
             inputs, label = img
 
             optimizer.zero_grad() #Initialisation de l'optimiseur
-            print('et de un')
             output = cnn(inputs)
-            print('fin de un')
+            print('label : ', label)
+            print('output : ', output)
             error = errorFunction(output, label)
             error.backward()
             optimizer.step()
 
             if i % 100 == 0:
                 print(error)
-"""
-    torch.save(cnn.state_dict(), "toto.dat") #Enregistrement du réseau dans un fichier
 
+    torch.save(cnn.state_dict(), "toto.dat") #Enregistrement du réseau dans un fichier
+"""
     #Pour ouvrir dans un autre script
     cnn = CNN()
     cnn.load_state_dict(torch.load("toto.dat"))
