@@ -14,4 +14,4 @@ Afin de faire  tourner ce programme, merci de suivre les étapes suivantes :
   * celà génère le fichier data.csv avec les correspondance nom de fichier, classe
 
 * Executer CNN.py
-  *Cela creer le fichier toto.dat, contenant les poids du cnn
+  * Celà creer le fichier toto.dat, contenant les poids du cnn
