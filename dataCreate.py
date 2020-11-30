@@ -15,6 +15,7 @@ IMAGE_HEIGHT=128
 IMAGE_SIZE=(IMAGE_WIDTH, IMAGE_HEIGHT)
 IMAGE_CHANNELS=3
 def createCsv():
+    print('Creating CSV')
     f = open('data.csv', 'w')
     with f:
         fHeaders = ['imgName', 'isCharlie']

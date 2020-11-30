@@ -1,21 +1,16 @@
 import torch
-import torchvision
 import torchvision.transforms as transforms
-
 import torch.nn as nn
+from CharlieDataset import CharlieDataset
+from dataCreate import createCsv
+import torch.nn.functional as F
 
+# Draws
+from torch.autograd import Variable
+import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from CharlieDataset import CharlieDataset
-from dataCreate import createCsv
-from torch.autograd import Variable
-import torch.nn.functional as F
-
-num_epochs = 5
-num_classes = 10
-batch_size = 100
-learning_rate = 0.001
 
 class CNN(nn.Module):
     def __init__(self):
@@ -25,31 +20,23 @@ class CNN(nn.Module):
         self.conv1 = torch.nn.Conv2d(3, 18, kernel_size=3, stride=1, padding=1)
         self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
-        # 4608 input features, 64 output features (see sizing flow below)
-        self.fc1 = torch.nn.Linear(18 * 50 * 50, 64)
+        # 45000 input features, 64 output features (see sizing flow below)
+        self.fc1 = torch.nn.Linear(18 * 50 * 50, 64) # oldOutPutChanne * (size/2)²
 
-        # 64 input features, 2 output features for our 2 defined classes
+        # 64 input features, 2 output for charlies labels
         self.fc2 = torch.nn.Linear(64, 2)
 
     def forward(self, x):
-        # Computes the activation of the first convolution
-        # Size changes from (3, 32, 32) to (18, 32, 32)
+        # (3, 100, 100) -> (18, 100, 100)
         x = self.conv1(x)
 
-        # Size changes from (18, 32, 32) to (18, 16, 16)
+        # (18, 100, 100) -> (18, 50, 50)
         x = self.pool(x)
-
-        # Reshape data to input to the input layer of the neural net
-        # Size changes from (18, 16, 16) to (1, 4608)
-        # Recall that the -1 infers this dimension from the other given dimension
+        # (18, 50, 50) -> (1, 45000)
         x = x.view(-1, 18 * 50 * 50)
-
-        # Computes the activation of the first fully connected layer
-        # Size changes from (1, 4608) to (1, 64)
+        # (1, 45000) -> (1, 64)
         x = F.relu(self.fc1(x))
-
-        # Computes the second fully connected layer (activation applied later)
-        # Size changes from (1, 64) to (1, 10)
+        # (1, 64) -> (1, 2)
         x = self.fc2(x)
         return (x)
 
@@ -57,13 +44,10 @@ class CNN(nn.Module):
 if __name__ == "__main__":
     createCsv()
     transform = transforms.ToTensor()
-    charlie_dataset = CharlieDataset('data.csv', 'charlies/', transform)
+    charlie_dataset_train = CharlieDataset('data.csv', 'charlies/', transform)
 
-    loader = torch.utils.data.DataLoader(charlie_dataset)
-
-    #print(charlie_dataset[0])
-    #print(len(charlie_dataset))
-    img, label = charlie_dataset[0]
+    loader = torch.utils.data.DataLoader(charlie_dataset_train)
+    img, label = charlie_dataset_train[0]
     #print(img.size(), label)
 
     #print(type(img))
@@ -83,10 +67,9 @@ if __name__ == "__main__":
     errorFunction = nn.CrossEntropyLoss()
 
 
-    for iteration in range(10000):
+    for iteration in range(300):
         for i, img in enumerate(loader):
             inputs, label = img
-
             optimizer.zero_grad() #Initialisation de l'optimiseur
             output = cnn(inputs)
             print('label : ', label)
