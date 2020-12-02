@@ -61,10 +61,10 @@ if __name__ == "__main__":
     # print("label", label)
 
     cnn = CNN()
-    optimizer = torch.optim.SGD(cnn.parameters(), lr=1e-4)
+    optimizer = torch.optim.SGD(cnn.parameters(), lr=1e-4, momentum=0.8)
     errorFunction = nn.CrossEntropyLoss()
 
-    for iteration in range(300):
+    for iteration in range(30):
 
         running_loss = 0.0
         for i, img in enumerate(loader):

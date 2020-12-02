@@ -22,17 +22,17 @@ def join(folderPath, rowSize, originalWidth, originalHeigth):
     accY = 0
     newImg = Image.new(mode = "RGB", size = (int(originalWidth) , int(originalHeigth) ))
     for element in os.listdir(folderPath):
-        print('row size : ', rowSize)
+        # print('row size : ', rowSize)
         img = Image.open('tmp/IMG-' + str(i) + '.jpg')
         i += 1
-        print(element)
+        # print(element)
         if acc >= rowSize: #End of file row
             acc = 0
             accY += 1
-            print('acc : '+ str(acc) +' accY : '+ str(accY) )
+            # print('acc : '+ str(acc) +' accY : '+ str(accY) )
             newImg.paste(img, (acc * 100, accY * 100))
         else:
-            print('acc : ' + str(acc) + ' accY : ' + str(accY))
+            # print('acc : ' + str(acc) + ' accY : ' + str(accY))
             newImg.paste(img, (acc * 100, accY * 100))
             acc += 1
     newImg.save('result.jpg')
@@ -51,22 +51,22 @@ def drawRectangleOnPath(path):
 
 def checkIsCharlie(output, path):
     listData = output.data.tolist()[0]
-    print('##########################')
-    print('')
-    print('Resultat : ',listData[1])
-    if listData[1]>0:
+    # print('##########################')
+    # print('')
+    if listData[1]>=2:
+        print('Resultat : ', listData[1])
         drawRectangleOnPath(path)
         print('C\'est charlie !')
-    print('')
-    print('##########################')
+    # print('')
+    # print('##########################')
 
 
 if __name__=='__main__':
     filePath= "source3.jpg"
     originalWidth = (Image.open(filePath).width)
     originalHeigth = (Image.open(filePath).height)
-    print('originalWidth : ', originalWidth)
-    print('originalHeigth : ', originalHeigth)
+    # print('originalWidth : ', originalWidth)
+    # print('originalHeigth : ', originalHeigth)
     height=100
     width=100
     start_num=0
