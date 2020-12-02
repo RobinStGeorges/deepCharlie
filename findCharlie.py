@@ -1,13 +1,12 @@
-import matplotlib
-from PIL import Image
 import os
-from matplotlib import patches
+import shutil
+
 import CNN as CNN
 import torch
 import torchvision.transforms as transforms
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image, ImageFont, ImageDraw, ImageEnhance
+from PIL import Image, ImageDraw
+import math
+import glob
 
 def crop(infile,height,width):
     im = Image.open(infile)
@@ -23,17 +22,19 @@ def join(folderPath, rowSize, originalWidth, originalHeigth):
     accY = 0
     newImg = Image.new(mode = "RGB", size = (int(originalWidth) , int(originalHeigth) ))
     for element in os.listdir(folderPath):
+        print('row size : ', rowSize)
         img = Image.open('tmp/IMG-' + str(i) + '.jpg')
         i += 1
-        if acc > rowSize: #End of file row
+        print(element)
+        if acc >= rowSize: #End of file row
             acc = 0
             accY += 1
+            print('acc : '+ str(acc) +' accY : '+ str(accY) )
             newImg.paste(img, (acc * 100, accY * 100))
         else:
+            print('acc : ' + str(acc) + ' accY : ' + str(accY))
             newImg.paste(img, (acc * 100, accY * 100))
             acc += 1
-
-
     newImg.save('result.jpg')
 
 def imgPathToTensor(path):
@@ -50,32 +51,50 @@ def drawRectangleOnPath(path):
 
 def checkIsCharlie(output, path):
     listData = output.data.tolist()[0]
-    if listData[1]>2.35:
+    print('##########################')
+    print('')
+    print('Resultat : ',listData[1])
+    if listData[1]>0:
         drawRectangleOnPath(path)
         print('C\'est charlie !')
+    print('')
+    print('##########################')
+
 
 if __name__=='__main__':
-    filePath= "source.jpg"
-    originalWidth = Image.open(filePath).width-101
-    originalHeigth = Image.open(filePath).height
+    filePath= "source3.jpg"
+    originalWidth = (Image.open(filePath).width)
+    originalHeigth = (Image.open(filePath).height)
+    print('originalWidth : ', originalWidth)
+    print('originalHeigth : ', originalHeigth)
     height=100
     width=100
     start_num=0
+
+    # Decoupage de l'image en taille 100*100
+    os.mkdir(os.path.join("tmp"))
     for k,piece in enumerate(crop(filePath,height,width),start_num):
         img=Image.new('RGB', (height,width), 255)
         img.paste(piece)
-        # path=os.path.join('\\tmp\\IMG-' + str(k) + '.jpg')
         THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
         img.save(THIS_FOLDER + '/tmp/IMG-' + str(k) + '.jpg')
 
+    # Creation du CNN a partir de la sauvegarde
     cnn = CNN.CNN() #charlie is in 95
     cnn.load_state_dict(torch.load("toto.dat"))
     cnn.eval() #toujours commencer par ça pour construire le réseau
+
+    # Recherche de charlie dans chacune des images de tmp
     for element in os.listdir('tmp/'):
         imgPath = element
         tensoredImg = imgPathToTensor('tmp/' + imgPath)
         output = cnn(tensoredImg)
         checkIsCharlie(output, 'tmp/' + imgPath)
-    join('tmp/', abs(originalWidth/height), originalWidth, originalHeigth)
+
+    # Recreation de l'image à partir des elements dans tmp/
+    join('tmp/', math.floor(abs(originalWidth/100))-1, originalWidth, originalHeigth)
+
+    # Supression des images 100*100
+    shutil.rmtree(os.path.join("tmp"))
 
 

@@ -48,43 +48,41 @@ if __name__ == "__main__":
 
     loader = torch.utils.data.DataLoader(charlie_dataset_train)
     img, label = charlie_dataset_train[0]
-    #print(img.size(), label)
 
+    ## Draw
+    #print(img.size(), label)
     #print(type(img))
     #print(type(label))
-
     # npimg = img.numpy()
     # npimg = np.transpose(npimg, (1, 2, 0))
     # plt.imshow(npimg)
     # plt.show()
-
     # print("img", img)
     # print("label", label)
 
     cnn = CNN()
-
     optimizer = torch.optim.SGD(cnn.parameters(), lr=1e-4)
     errorFunction = nn.CrossEntropyLoss()
 
-
     for iteration in range(300):
+
+        running_loss = 0.0
         for i, img in enumerate(loader):
+
             inputs, label = img
             optimizer.zero_grad() #Initialisation de l'optimiseur
             output = cnn(inputs)
-            print('label : ', label)
-            print('output : ', output)
             error = errorFunction(output, label)
             error.backward()
             optimizer.step()
 
-            if i % 100 == 0:
-                print(error)
+            # if i % 100 == 0:
+            #     print(error)
+            running_loss += error.item()
+            if i % 50 == 49:
+                print('[%d, %5d] error: %.3f' %
+                      (iteration + 1, i + 1, running_loss / 50))
+                running_loss = 0.0
 
     torch.save(cnn.state_dict(), "toto.dat") #Enregistrement du réseau dans un fichier
-"""
-    #Pour ouvrir dans un autre script
-    cnn = CNN()
-    cnn.load_state_dict(torch.load("toto.dat"))
-    cnn.eval() #toujours commencer par ça pour construire le réseau
-    """
+    print('poids sauvegardé')
