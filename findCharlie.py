@@ -51,10 +51,11 @@ def drawRectangleOnPath(path):
 
 def checkIsCharlie(output, path):
     listData = output.data.tolist()[0]
+    resultat = listData[1]
     # print('##########################')
-    # print('')
-    if listData[1]>=2:
-        print('Resultat : ', listData[1])
+    print('resultat : ', resultat)
+    if(listData[0]>=0.42 ):
+        print('Resultat : ', resultat)
         drawRectangleOnPath(path)
         print('C\'est charlie !')
     # print('')
@@ -62,7 +63,7 @@ def checkIsCharlie(output, path):
 
 
 if __name__=='__main__':
-    filePath= "source3.jpg"
+    filePath= "source.jpg"
     originalWidth = (Image.open(filePath).width)
     originalHeigth = (Image.open(filePath).height)
     # print('originalWidth : ', originalWidth)
